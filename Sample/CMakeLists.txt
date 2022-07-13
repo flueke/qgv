@@ -13,6 +13,7 @@ SET(qgv_CPP
 
 add_executable(qgv_example
     MainWindow.ui
+    ress.qrc
     main.cpp
     MainWindow.cpp
     QGraphicsViewEc.cpp

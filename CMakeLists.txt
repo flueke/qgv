@@ -31,6 +31,10 @@ set(${PROJECT_NAME}_SOVERSION ${TARGET_VERSION_MAJOR})
 set(${PROJECT_NAME}_VERSION
     "${TARGET_VERSION_MAJOR}.${TARGET_VERSION_MINOR}.${${PROJECT_NAME}_PATCH_LEVEL}" )
 
+## Create binaries in the root of the build directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
 # Extending the Module path with the local module path of desuto
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/modules")
 

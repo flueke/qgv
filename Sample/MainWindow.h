@@ -37,6 +37,8 @@ public:
 private slots:
     void nodeContextMenu(QGVNode* node);
     void nodeDoubleClick(QGVNode* node);
+    void loadDotFile();
+    void addDotFile();
 
 private:
     Ui::MainWindow *ui;

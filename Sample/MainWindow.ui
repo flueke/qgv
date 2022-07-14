@@ -33,7 +33,7 @@
      <x>0</x>
      <y>0</y>
      <width>817</width>
-     <height>21</height>
+     <height>22</height>
     </rect>
    </property>
   </widget>
@@ -44,8 +44,26 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
+   <addaction name="action_AddDot"/>
+   <addaction name="action_LoadDot"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
+  <action name="action_LoadDot">
+   <property name="text">
+    <string>Load dot file</string>
+   </property>
+   <property name="toolTip">
+    <string>Load dot file</string>
+   </property>
+  </action>
+  <action name="action_AddDot">
+   <property name="text">
+    <string>Add dot file</string>
+   </property>
+   <property name="toolTip">
+    <string>Add dot file</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>

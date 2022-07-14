@@ -23,6 +23,7 @@ License along with this library.
 #include "QGVEdge.h"
 #include "QGVSubGraph.h"
 #include <QMessageBox>
+#include <QFileDialog>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -35,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     connect(_scene, SIGNAL(nodeContextMenu(QGVNode*)), SLOT(nodeContextMenu(QGVNode*)));
     connect(_scene, SIGNAL(nodeDoubleClick(QGVNode*)), SLOT(nodeDoubleClick(QGVNode*)));
+    connect(ui->action_LoadDot, &QAction::triggered, this, &MainWindow::loadDotFile);
+    connect(ui->action_AddDot, &QAction::triggered, this, &MainWindow::addDotFile);
 }
 
 MainWindow::~MainWindow()
@@ -136,4 +139,39 @@ void MainWindow::nodeContextMenu(QGVNode *node)
 void MainWindow::nodeDoubleClick(QGVNode *node)
 {
     QMessageBox::information(this, tr("Node double clicked"), tr("Node %1").arg(node->label()));
+}
+
+void MainWindow::loadDotFile()
+{
+    auto filename = QFileDialog::getOpenFileName(this, "Open dot file", "", "Dot files (*.dot)");
+
+    if (filename.isEmpty())
+        return;
+
+    QFile inFile(filename);
+
+    if (!inFile.open(QIODevice::ReadOnly))
+        return;
+
+    auto data = QString::fromLocal8Bit(inFile.readAll());
+
+    _scene->clear();
+    _scene->loadLayout(data);
+}
+
+void MainWindow::addDotFile()
+{
+    auto filename = QFileDialog::getOpenFileName(this, "Open dot file", "", "Dot files (*.dot)");
+
+    if (filename.isEmpty())
+        return;
+
+    QFile inFile(filename);
+
+    if (!inFile.open(QIODevice::ReadOnly))
+        return;
+
+    auto data = QString::fromLocal8Bit(inFile.readAll());
+
+    _scene->loadLayout(data);
 }

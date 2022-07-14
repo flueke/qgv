@@ -20,8 +20,12 @@ License along with this library.
 #include <QGVScene.h>
 #include <QGVGraphPrivate.h>
 #include <QGVNodePrivate.h>
+#include <QTextDocument>
 #include <QDebug>
 #include <QPainter>
+#include <QStaticText>
+#include <QFontMetricsF>
+#include <QPicture>
 
 QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *scene): _scene(scene), _node(node)
 {
@@ -69,9 +73,64 @@ void QGVNode::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
     painter->setPen(QGVCore::toColor(getAttribute("labelfontcolor")));
 
     const QRectF rect = boundingRect().adjusted(2,2,-2,-2); //Margin
+
     if(_icon.isNull())
     {
-        painter->drawText(rect, Qt::AlignCenter , QGVNode::label());
+        auto text = label();
+
+        #if 0
+            // original version (does not support any html formatting)
+            painter->drawText(rect, Qt::AlignCenter , QGVNode::label());
+        #elif 0
+            // using QTextDocument to render
+            // text looks ok but the position is too far to the top-left
+            QTextDocument doc;
+            doc.setHtml(text);
+            doc.drawContents(painter);
+            auto oldPen = painter->pen();
+            painter->setPen(QPen(Qt::red));
+            painter->drawRect(boundingRect());
+            painter->setPen(oldPen);
+        #elif 0
+            // using QStaticText
+            // similar to the QTextDocument version: looks ok but text is too far
+            // to the top-left
+            QStaticText staticText(text);
+            //staticText.prepare(painter->
+
+            auto oldPen = painter->pen();
+            painter->setPen(QPen(Qt::red));
+            painter->drawRect(boundingRect());
+            painter->setPen(oldPen);
+            painter->drawStaticText(rect.topLeft(), QStaticText(text));
+        #elif 0
+            // using QFontMetrics to determine the bounding box of the rendered
+            // text, then position the painter so that the text bounding rect is
+            // centered inside this nodes bounding rect.
+            QFontMetricsF fm(painter->font());
+            auto textRect = fm.boundingRect(text); // note: does not take html linebreaks into account
+            auto textRectMapped = painter->transform().mapRect(textRect);
+            qDebug() << "nodeRect:" << rect << ", textRect:" << textRect << ", textRectMapped:" << textRectMapped;
+            painter->setPen(QPen(Qt::green));
+            painter->drawRect(boundingRect());
+
+            painter->setPen(QPen(Qt::blue));
+            painter->drawRect(textRect);
+            painter->drawStaticText(textRect.topLeft(), QStaticText(text));
+
+            painter->setPen(QPen(Qt::red));
+            painter->drawRect(textRectMapped);
+        #elif 1
+            // use a qpainter to paint into a qpicture.
+            // then use the original painter to draw the picture
+            QPicture pic;
+            QPainter picPainter(&pic);
+            //picPainter.setTransform(painter->transform());
+            picPainter.drawStaticText(rect.topLeft(), QStaticText(text));
+            picPainter.end();
+            qDebug() << "pic boundingRect" << pic.boundingRect();
+            painter->drawPicture(0, 0, pic);
+        #endif
     }
     else
     {

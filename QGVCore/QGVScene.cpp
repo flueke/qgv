@@ -188,6 +188,7 @@ void QGVScene::loadLayout(const QString &text)
         }
 
     }
+    setSceneRect(itemsBoundingRect());
     update();
 }
 
@@ -228,6 +229,7 @@ void QGVScene::applyLayout()
 
     gvFreeLayout(_context->context(), _graph->graph());
 
+    setSceneRect(itemsBoundingRect());
     update();
 }
 

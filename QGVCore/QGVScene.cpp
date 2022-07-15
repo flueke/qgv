@@ -180,11 +180,13 @@ void QGVScene::loadLayout(const QString &text)
         QGVNode *inode = new QGVNode(new QGVNodePrivate(node, _graph->graph()), this);
         inode->updateLayout();
         addItem(inode);
+        _nodes.append(inode);
         for (Agedge_t* edge = agfstout(_graph->graph(), node); edge != NULL; edge = agnxtout(_graph->graph(), edge))
         {
             QGVEdge *iedge = new QGVEdge(new QGVEdgePrivate(edge), this);
             iedge->updateLayout();
             addItem(iedge);
+            _edges.append(iedge);
         }
 
     }
@@ -298,4 +300,18 @@ void QGVScene::drawBackground(QPainter * painter, const QRectF & rect)
     painter->drawLines(lines.data(), lines.size());
     painter->setPen(Qt::black);
     //painter->drawRect(sceneRect());
+}
+
+void QGVScene::updateLayout()
+{
+    for (auto n: _nodes)
+        n->updateLayout();
+
+    for (auto e: _edges)
+        e->updateLayout();
+
+    for (auto s: _subGraphs)
+        s->updateLayout();
+
+    qDebug() << "node, edge and subgraph layouts udpated";
 }

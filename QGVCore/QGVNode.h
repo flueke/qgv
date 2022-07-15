@@ -25,6 +25,7 @@ License along with this library.
 class QGVEdge;
 class QGVScene;
 class QGVNodePrivate;
+class QGraphicsTextItem;
 
 /**
  * @brief Node item
@@ -37,6 +38,8 @@ public:
 
     QString label() const;
     void setLabel(const QString &label);
+
+    QString name() const;
 
     QRectF boundingRect() const;
     void paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget = 0);
@@ -68,6 +71,8 @@ private:
 
     QGVScene *_scene;
     QGVNodePrivate* _node;
+
+    QGraphicsTextItem *textItem_ = nullptr;
 };
 
 

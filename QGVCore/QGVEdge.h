@@ -72,6 +72,8 @@ private:
 
     QString _label;
     QRectF _label_rect;
+
+    QGraphicsTextItem *textItem_ = nullptr;
 };
 
 #endif // QGVEDGE_H

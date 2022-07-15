@@ -58,6 +58,9 @@ public:
     void applyLayout();
     void clear();
 
+public slots:
+    void updateLayout(); // calls updateLayout() on all child elements
+
 
 signals:
     void nodeContextMenu(QGVNode* node);
@@ -70,7 +73,7 @@ signals:
     void subGraphDoubleClick(QGVSubGraph* graph);
 
     void graphContextMenuEvent();
-    
+
 public slots:
 
 protected:

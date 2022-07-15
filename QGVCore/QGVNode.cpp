@@ -26,10 +26,15 @@ License along with this library.
 #include <QStaticText>
 #include <QFontMetricsF>
 #include <QPicture>
+#include <QGraphicsTextItem>
 
-QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *scene): _scene(scene), _node(node)
+QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *scene)
+    : _scene(scene)
+    , _node(node)
+    , textItem_(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    textItem_->hide();
 }
 
 QGVNode::~QGVNode()
@@ -40,12 +45,22 @@ QGVNode::~QGVNode()
 
 QString QGVNode::label() const
 {
-    return getAttribute("label");
+    auto ret = getAttribute("label");
+    if (ret.isEmpty() || ret == "\\N")
+        ret = name();
+    return ret;
 }
 
 void QGVNode::setLabel(const QString &label)
 {
     setAttribute("label", label);
+}
+
+QString QGVNode::name() const
+{
+    if (char *n = agnameof(_node->node()))
+        return n;
+    return {};
 }
 
 QRectF QGVNode::boundingRect() const
@@ -76,61 +91,6 @@ void QGVNode::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
 
     if(_icon.isNull())
     {
-        auto text = label();
-
-        #if 0
-            // original version (does not support any html formatting)
-            painter->drawText(rect, Qt::AlignCenter , QGVNode::label());
-        #elif 0
-            // using QTextDocument to render
-            // text looks ok but the position is too far to the top-left
-            QTextDocument doc;
-            doc.setHtml(text);
-            doc.drawContents(painter);
-            auto oldPen = painter->pen();
-            painter->setPen(QPen(Qt::red));
-            painter->drawRect(boundingRect());
-            painter->setPen(oldPen);
-        #elif 0
-            // using QStaticText
-            // similar to the QTextDocument version: looks ok but text is too far
-            // to the top-left
-            QStaticText staticText(text);
-            //staticText.prepare(painter->
-
-            auto oldPen = painter->pen();
-            painter->setPen(QPen(Qt::red));
-            painter->drawRect(boundingRect());
-            painter->setPen(oldPen);
-            painter->drawStaticText(rect.topLeft(), QStaticText(text));
-        #elif 0
-            // using QFontMetrics to determine the bounding box of the rendered
-            // text, then position the painter so that the text bounding rect is
-            // centered inside this nodes bounding rect.
-            QFontMetricsF fm(painter->font());
-            auto textRect = fm.boundingRect(text); // note: does not take html linebreaks into account
-            auto textRectMapped = painter->transform().mapRect(textRect);
-            qDebug() << "nodeRect:" << rect << ", textRect:" << textRect << ", textRectMapped:" << textRectMapped;
-            painter->setPen(QPen(Qt::green));
-            painter->drawRect(boundingRect());
-
-            painter->setPen(QPen(Qt::blue));
-            painter->drawRect(textRect);
-            painter->drawStaticText(textRect.topLeft(), QStaticText(text));
-
-            painter->setPen(QPen(Qt::red));
-            painter->drawRect(textRectMapped);
-        #elif 1
-            // use a qpainter to paint into a qpicture.
-            // then use the original painter to draw the picture
-            QPicture pic;
-            QPainter picPainter(&pic);
-            //picPainter.setTransform(painter->transform());
-            picPainter.drawStaticText(rect.topLeft(), QStaticText(text));
-            picPainter.end();
-            qDebug() << "pic boundingRect" << pic.boundingRect();
-            painter->drawPicture(0, 0, pic);
-        #endif
     }
     else
     {
@@ -184,4 +144,21 @@ void QGVNode::updateLayout()
     _pen.setColor(QGVCore::toColor(getAttribute("color")));
 
     setToolTip(getAttribute("tooltip"));
+
+    if (_icon.isNull() && !label().isEmpty())
+    {
+        textItem_->setHtml(label());
+        textItem_->setPos(0, 0);
+        auto itemRect = textItem_->boundingRect();
+        auto nodeCenter = textItem_->mapFromParent(boundingRect().center());
+        itemRect.moveCenter(nodeCenter);
+
+        //qDebug() << this << "node pos=" << pos() << "textItem pos=" << textItem_->pos();
+        //qDebug() << this << "node rect=" << boundingRect() << ", textItem rect=" << textItem_->boundingRect();
+
+        textItem_->setPos(itemRect.topLeft());
+        textItem_->show();
+    }
+    else
+        textItem_->hide();
 }

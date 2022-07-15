@@ -23,9 +23,13 @@ License along with this library.
 #include <QDebug>
 #include <QPainter>
 
-QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *scene) :  _scene(scene), _edge(edge)
+QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *scene)
+    : _scene(scene)
+    , _edge(edge)
+    , textItem_(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+    textItem_->hide();
 }
 
 QGVEdge::~QGVEdge()
@@ -88,11 +92,12 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
     }
     else
     */
-    painter->drawText(_label_rect, Qt::AlignCenter, _label);
+    //painter->drawText(_label_rect, Qt::AlignCenter, _label);
 
     painter->setBrush(QBrush(_pen.color(), Qt::SolidPattern));
     painter->drawPolygon(_head_arrow);
     painter->drawPolygon(_tail_arrow);
+
     painter->restore();
 }
 
@@ -114,9 +119,9 @@ void QGVEdge::updateLayout()
 {
     prepareGeometryChange();
 
-		qreal gheight = QGVCore::graphHeight(_scene->_graph->graph());
+    qreal gheight = QGVCore::graphHeight(_scene->_graph->graph());
 
-		const splines* spl = ED_spl(_edge->edge());
+    const splines* spl = ED_spl(_edge->edge());
     _path = QGVCore::toPath(spl, gheight);
 
 
@@ -139,13 +144,41 @@ void QGVEdge::updateLayout()
     _pen.setStyle(QGVCore::toPenStyle(getAttribute("style")));
 
     //Edge label
-		textlabel_t *xlabel = ED_xlabel(_edge->edge());
+#if 0
+    textlabel_t *xlabel = ED_xlabel(_edge->edge());
+
+    if (!xlabel)
+        xlabel = ED_label(_edge->edge());
+
     if(xlabel)
     {
         _label = xlabel->text;
         _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
 				_label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
     }
+#else
+    // FIXME: this crashes when using updateLayout() with the graph from the
+    // qgv_example tool. The label is non-null but the structure contains
+    // garbage data. Does not happen when calling updateLayout() with one of my
+    // test dotfiles loaded.
+    textlabel_t *label = ED_xlabel(_edge->edge());
+
+    if (!label)
+       label = ED_label(_edge->edge());
+
+    if (label)
+    {
+        textItem_->setHtml(label->text);
+        textItem_->setPos(0, 0);
+        auto itemRect = textItem_->boundingRect();
+        auto labelCenter = QGVCore::toPoint(label->pos, gheight);
+        itemRect.moveCenter(labelCenter);
+        textItem_->setPos(itemRect.topLeft());
+        textItem_->show();
+    }
+    else
+        textItem_->hide();
+#endif
 
     setToolTip(getAttribute("tooltip"));
 }

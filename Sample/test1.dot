@@ -1,0 +1,11 @@
+strict digraph {
+    rankdir=LR
+    id=OuterGraph
+
+    a [label=simple]
+    b [label=<<b>bold</b>>]
+    c [label=<with<br/>break>]
+    a -> b [label="edge label"]
+    a -> c [label=<with<br/>html>]
+    a -> a [xlabel=xlabel]
+}

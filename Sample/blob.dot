@@ -1,0 +1,9 @@
+strict digraph {
+  rankdir=RL
+  id=OuterGraph
+
+  a
+  b
+  a -> b [label=foo fontname="Bitstream Vera Sans"]
+
+}

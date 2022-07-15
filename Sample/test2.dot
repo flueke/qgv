@@ -1,0 +1,6 @@
+strict digraph {
+    rankdir=LR
+    id=OuterGraph
+
+    c [label=<with<br/>break>]
+}

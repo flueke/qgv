@@ -46,6 +46,7 @@
    </attribute>
    <addaction name="action_AddDot"/>
    <addaction name="action_LoadDot"/>
+   <addaction name="action_UpdateLayout"/>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
   <action name="action_LoadDot">
@@ -62,6 +63,14 @@
    </property>
    <property name="toolTip">
     <string>Add dot file</string>
+   </property>
+  </action>
+  <action name="action_UpdateLayout">
+   <property name="text">
+    <string>Update Layout</string>
+   </property>
+   <property name="toolTip">
+    <string>Call updateLayout() on scene items</string>
    </property>
   </action>
  </widget>

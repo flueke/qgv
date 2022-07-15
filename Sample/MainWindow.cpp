@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_scene, SIGNAL(nodeDoubleClick(QGVNode*)), SLOT(nodeDoubleClick(QGVNode*)));
     connect(ui->action_LoadDot, &QAction::triggered, this, &MainWindow::loadDotFile);
     connect(ui->action_AddDot, &QAction::triggered, this, &MainWindow::addDotFile);
+    connect(ui->action_UpdateLayout, &QAction::triggered, _scene, &QGVScene::updateLayout);
 }
 
 MainWindow::~MainWindow()

@@ -16,20 +16,19 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library.
 ***************************************************************/
 #include "QGVScene.h"
-// The following include allows the automoc to detect, that it must moc this class
-#include "moc_QGVScene.cpp"
+
+#include <iostream>
 #include <QDebug>
-
-#include <QGVNode.h>
-#include <QGVEdge.h>
-#include <QGVSubGraph.h>
-
 #include <QGVCore.h>
+#include <QGVEdge.h>
+#include <QGVEdgePrivate.h>
 #include <QGVGraphPrivate.h>
 #include <QGVGvcPrivate.h>
-#include <QGVEdgePrivate.h>
+#include <QGVNode.h>
 #include <QGVNodePrivate.h>
-#include <iostream>
+#include <QGVSubGraph.h>
+#include <QPainter>
+#include <QVarLengthArray>
 
 QGVScene::QGVScene(const QString &name, QObject *parent) : QGraphicsScene(parent)
 {
@@ -165,12 +164,6 @@ void QGVScene::loadLayout(const QString &text)
 {
     _graph->setGraph(QGVCore::agmemread2(text.toLocal8Bit().constData()));
 
-    if(gvLayout(_context->context(), _graph->graph(), "dot") != 0)
-    {
-        qCritical()<<"Layout render error"<<agerrors()<<QString::fromLocal8Bit(aglasterr());
-        return;
-    }
-
     //Debug output
 		//gvRenderFilename(_context->context(), _graph->graph(), "png", "debug.png");
 
@@ -178,20 +171,20 @@ void QGVScene::loadLayout(const QString &text)
     for (Agnode_t* node = agfstnode(_graph->graph()); node != NULL; node = agnxtnode(_graph->graph(), node))
     {
         QGVNode *inode = new QGVNode(new QGVNodePrivate(node, _graph->graph()), this);
-        inode->updateLayout();
+        //inode->updateLayout();
         addItem(inode);
         _nodes.append(inode);
         for (Agedge_t* edge = agfstout(_graph->graph(), node); edge != NULL; edge = agnxtout(_graph->graph(), edge))
         {
             QGVEdge *iedge = new QGVEdge(new QGVEdgePrivate(edge), this);
-            iedge->updateLayout();
+            //iedge->updateLayout();
             addItem(iedge);
             _edges.append(iedge);
         }
 
     }
-    setSceneRect(itemsBoundingRect());
-    update();
+
+    applyLayout();
 }
 
 void QGVScene::applyLayout()
@@ -211,23 +204,7 @@ void QGVScene::applyLayout()
 		//gvRenderFilename(_context->context(), _graph->graph(), "canon", "debug.dot");
 		//gvRenderFilename(_context->context(), _graph->graph(), "png", "debug.png");
 
-    //Update items layout
-    foreach(QGVNode* node, _nodes)
-        node->updateLayout();
-
-    foreach(QGVEdge* edge, _edges)
-        edge->updateLayout();
-
-    foreach(QGVSubGraph* sgraph, _subGraphs)
-        sgraph->updateLayout();
-
-    //Graph label
-    textlabel_t *xlabel = GD_label(_graph->graph());
-    if(xlabel)
-    {
-        QGraphicsTextItem *item = addText(xlabel->text);
-        item->setPos(QGVCore::centerToOrigin(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_graph->graph())), xlabel->dimen.x, -4));
-    }
+    updateLayout();
 
     gvFreeLayout(_context->context(), _graph->graph());
 
@@ -235,13 +212,24 @@ void QGVScene::applyLayout()
     update();
 }
 
-void QGVScene::clear()
+void QGVScene::clearGraphItems()
 {
     gvFreeLayout(_context->context(), _graph->graph());
+    for (auto node: _nodes)
+        removeItem(node);
     _nodes.clear();
+
+    for (auto edge: _edges)
+        removeItem(edge);
     _edges.clear();
+
+    for (auto sg: _subGraphs)
+        removeItem(sg);
     _subGraphs.clear();
-    QGraphicsScene::clear();
+
+    removeItem(_graphLabelItem);
+    delete _graphLabelItem;
+    _graphLabelItem = nullptr;
 }
 
 #include <QGraphicsSceneContextMenuEvent>
@@ -265,21 +253,30 @@ void QGVScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent
 
 void QGVScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    QGraphicsItem *item = itemAt(mouseEvent->scenePos(), QTransform());
-    if(item)
+    auto items = this->items(mouseEvent->scenePos());
+
+    for (auto item: items)
     {
         if(item->type() == QGVNode::Type)
+        {
             emit nodeDoubleClick(qgraphicsitem_cast<QGVNode*>(item));
+            break;
+        }
         else if(item->type() == QGVEdge::Type)
+        {
             emit edgeDoubleClick(qgraphicsitem_cast<QGVEdge*>(item));
+            break;
+        }
         else if(item->type() == QGVSubGraph::Type)
+        {
             emit subGraphDoubleClick(qgraphicsitem_cast<QGVSubGraph*>(item));
+            break;
+        }
     }
+
     QGraphicsScene::mouseDoubleClickEvent(mouseEvent);
 }
 
-#include <QVarLengthArray>
-#include <QPainter>
 void QGVScene::drawBackground(QPainter * painter, const QRectF & rect)
 {
     const int gridSize = 25;
@@ -313,5 +310,19 @@ void QGVScene::updateLayout()
     for (auto s: _subGraphs)
         s->updateLayout();
 
-    qDebug() << "node, edge and subgraph layouts udpated";
+    //Graph label
+    if (textlabel_t *xlabel = GD_label(_graph->graph()))
+    {
+        if (!_graphLabelItem)
+        {
+            _graphLabelItem = new QGraphicsTextItem;
+            addItem(_graphLabelItem);
+        }
+
+        _graphLabelItem->setPos(QGVCore::centerToOrigin(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_graph->graph())), xlabel->dimen.x, -4));
+        _graphLabelItem->setPlainText(xlabel->text);
+        _graphLabelItem->show();
+    }
+    else if (_graphLabelItem)
+        _graphLabelItem->hide();
 }

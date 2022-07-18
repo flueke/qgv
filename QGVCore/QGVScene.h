@@ -54,13 +54,11 @@ public:
 
     void setRootNode(QGVNode *node);
 
-    void loadLayout(const QString &text);
-    void applyLayout();
-    void clear();
 
 public slots:
-    void updateLayout(); // calls updateLayout() on all child elements
-
+    void loadLayout(const QString &text);
+    void applyLayout();
+    void clearGraphItems();
 
 signals:
     void nodeContextMenu(QGVNode* node);
@@ -74,13 +72,12 @@ signals:
 
     void graphContextMenuEvent();
 
-public slots:
-
 protected:
     virtual void contextMenuEvent(QGraphicsSceneContextMenuEvent * contextMenuEvent);
     virtual void mouseDoubleClickEvent(QGraphicsSceneMouseEvent * mouseEvent);
     virtual void drawBackground(QPainter * painter, const QRectF & rect);
 private:
+    void updateLayout(); // calls updateLayout() on all child elements
     friend class QGVNode;
     friend class QGVEdge;
     friend class QGVSubGraph;
@@ -92,6 +89,7 @@ private:
     QList<QGVNode*> _nodes;
     QList<QGVEdge*> _edges;
     QList<QGVSubGraph*> _subGraphs;
+    QGraphicsTextItem *_graphLabelItem = nullptr;
 };
 
 #endif // QGVSCENE_H

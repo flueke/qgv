@@ -24,6 +24,7 @@ License along with this library.
 #include "QGVSubGraph.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -37,8 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(_scene, SIGNAL(nodeContextMenu(QGVNode*)), SLOT(nodeContextMenu(QGVNode*)));
     connect(_scene, SIGNAL(nodeDoubleClick(QGVNode*)), SLOT(nodeDoubleClick(QGVNode*)));
     connect(ui->action_LoadDot, &QAction::triggered, this, &MainWindow::loadDotFile);
-    connect(ui->action_AddDot, &QAction::triggered, this, &MainWindow::addDotFile);
-    connect(ui->action_UpdateLayout, &QAction::triggered, _scene, &QGVScene::updateLayout);
+    connect(ui->action_UpdateLayout, &QAction::triggered, _scene, &QGVScene::applyLayout);
 }
 
 MainWindow::~MainWindow()
@@ -55,6 +55,10 @@ void MainWindow::drawGraph()
     ui->graphicsView->setScene(_scene);
     return;
     */
+
+#if 0
+    _scene->loadLayout("digraph test{node [style=filled,fillcolor=white];N1 -> N2;N2 -> N3;N3 -> N4;N4 -> N1;}");
+#else
 
     //Configure scene attributes
     _scene->setGraphAttribute("label", "DEMO");
@@ -119,6 +123,7 @@ void MainWindow::drawGraph()
     //Layout scene
     _scene->applyLayout();
 
+#endif
     //Fit in view
     ui->graphicsView->fitInView(_scene->sceneRect(), Qt::KeepAspectRatio);
 }
@@ -139,7 +144,8 @@ void MainWindow::nodeContextMenu(QGVNode *node)
 
 void MainWindow::nodeDoubleClick(QGVNode *node)
 {
-    QMessageBox::information(this, tr("Node double clicked"), tr("Node %1").arg(node->label()));
+    //QMessageBox::information(this, tr("Node double clicked"), tr("Node %1").arg(node->label()));
+    qDebug() << "Node double clicked: node=" << node << ", name=" << node->name();
 }
 
 void MainWindow::loadDotFile()
@@ -156,23 +162,6 @@ void MainWindow::loadDotFile()
 
     auto data = QString::fromLocal8Bit(inFile.readAll());
 
-    _scene->clear();
-    _scene->loadLayout(data);
-}
-
-void MainWindow::addDotFile()
-{
-    auto filename = QFileDialog::getOpenFileName(this, "Open dot file", "", "Dot files (*.dot)");
-
-    if (filename.isEmpty())
-        return;
-
-    QFile inFile(filename);
-
-    if (!inFile.open(QIODevice::ReadOnly))
-        return;
-
-    auto data = QString::fromLocal8Bit(inFile.readAll());
-
+    _scene->clearGraphItems();
     _scene->loadLayout(data);
 }

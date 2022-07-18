@@ -152,10 +152,8 @@ void QGVNode::updateLayout()
         auto itemRect = textItem_->boundingRect();
         auto nodeCenter = textItem_->mapFromParent(boundingRect().center());
         itemRect.moveCenter(nodeCenter);
-
         //qDebug() << this << "node pos=" << pos() << "textItem pos=" << textItem_->pos();
         //qDebug() << this << "node rect=" << boundingRect() << ", textItem rect=" << textItem_->boundingRect();
-
         textItem_->setPos(itemRect.topLeft());
         textItem_->show();
     }

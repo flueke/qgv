@@ -28,7 +28,7 @@ class MainWindow;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
-    
+
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -38,7 +38,6 @@ private slots:
     void nodeContextMenu(QGVNode* node);
     void nodeDoubleClick(QGVNode* node);
     void loadDotFile();
-    void addDotFile();
 
 private:
     Ui::MainWindow *ui;

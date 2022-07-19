@@ -19,6 +19,7 @@ License along with this library.
 
 #include <iostream>
 #include <QDebug>
+#include <QGraphicsSceneContextMenuEvent>
 #include <QGVCore.h>
 #include <QGVEdge.h>
 #include <QGVEdgePrivate.h>
@@ -167,8 +168,21 @@ void QGVScene::loadLayout(const QString &text)
 
     _graph->setGraph(QGVCore::agmemread2(text.toLocal8Bit().constData()));
 
+    if (!_graph->graph())
+        return;
+
     //Debug output
 		//gvRenderFilename(_context->context(), _graph->graph(), "png", "debug.png");
+
+    // Add subgraphs first to layer them below other items.
+    // Note: The loop only picks up the immediate subgraphs of the given graph.
+    // Recursion would be needed to find all subgraphs.
+    for (auto sg = agfstsubg(_graph->graph()); sg; sg = agnxtsubg(sg))
+    {
+        auto sgItem = new QGVSubGraph(new QGVGraphPrivate(sg), this);
+        addItem(sgItem);
+        _subGraphs.append(sgItem);
+    }
 
     //Read nodes and edges
     for (Agnode_t* node = agfstnode(_graph->graph()); node != NULL; node = agnxtnode(_graph->graph(), node))
@@ -180,6 +194,7 @@ void QGVScene::loadLayout(const QString &text)
         for (Agedge_t* edge = agfstout(_graph->graph(), node); edge != NULL; edge = agnxtout(_graph->graph(), edge))
         {
             QGVEdge *iedge = new QGVEdge(new QGVEdgePrivate(edge), this);
+            iedge->setFlag(QGraphicsItem::ItemIsSelectable, false);
             //iedge->updateLayout();
             addItem(iedge);
             _edges.append(iedge);
@@ -238,7 +253,6 @@ void QGVScene::clearGraphItems()
     }
 }
 
-#include <QGraphicsSceneContextMenuEvent>
 void QGVScene::contextMenuEvent(QGraphicsSceneContextMenuEvent *contextMenuEvent)
 {
     QGraphicsItem *item = itemAt(contextMenuEvent->scenePos(), QTransform());

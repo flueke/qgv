@@ -1,16 +1,3 @@
-# enable all QT-Stuff we need
-# see http://cmake.org/cmake/help/cmake2.6docs.html#module:FindQt4 for a complete list
-
-SET(qgv_TS
-)
-
-SET(qgv_UI
-)
-
-# all files which may be mocced
-SET(qgv_CPP
-    )
-
 add_executable(qgv_example
     MainWindow.ui
     ress.qrc

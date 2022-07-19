@@ -50,7 +50,5 @@ find_package(Graphviz REQUIRED)
 # include source tree
 #
 ######################
-set(libqgv_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/QGVCore)
-set(libqgv_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR}/QGVCore)
 add_subdirectory(QGVCore)
 add_subdirectory(Sample)

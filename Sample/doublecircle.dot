@@ -1,0 +1,15 @@
+digraph {
+    forcelabels=true;
+    rankdir=LR;
+    graph[ranksep=1,nodesep=.5];
+    node[shape=box];
+    "start" [xlabel="start",xlp="0,0",shape=doublecircle,label=" "];
+    "requested"->"fault";
+    "requested"->"progress";
+    "start"->"requested";
+    "progress"->"fault";
+    "progress"->"progress";
+    "progress"->"complete";
+    "fault" [xlabel="fault",shape=doublecircle,label=" "];
+    "complete" [xlabel="complete",shape=doublecircle,label=" "];
+}

@@ -162,6 +162,9 @@ void QGVScene::setRootNode(QGVNode *node)
 
 void QGVScene::loadLayout(const QString &text)
 {
+    clearGraphItems();
+    agclose(_graph->graph());
+
     _graph->setGraph(QGVCore::agmemread2(text.toLocal8Bit().constData()));
 
     //Debug output
@@ -227,9 +230,12 @@ void QGVScene::clearGraphItems()
         removeItem(sg);
     _subGraphs.clear();
 
-    removeItem(_graphLabelItem);
-    delete _graphLabelItem;
-    _graphLabelItem = nullptr;
+    if (_graphLabelItem)
+    {
+        removeItem(_graphLabelItem);
+        delete _graphLabelItem;
+        _graphLabelItem = nullptr;
+    }
 }
 
 #include <QGraphicsSceneContextMenuEvent>

@@ -279,6 +279,9 @@ void QGVScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void QGVScene::drawBackground(QPainter * painter, const QRectF & rect)
 {
+    if (!shouldDrawBackgroundGrid())
+        return;
+
     const int gridSize = 25;
 
     const qreal left = int(rect.left()) - (int(rect.left()) % gridSize);

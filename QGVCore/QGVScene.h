@@ -54,11 +54,20 @@ public:
 
     void setRootNode(QGVNode *node);
 
+    bool shouldDrawBackgroundGrid() const
+    {
+        return drawBackgroundGrid_;
+    }
 
 public slots:
     void loadLayout(const QString &text);
     void applyLayout();
     void clearGraphItems();
+    void setDrawBackgroundGrid(bool drawGrid)
+    {
+        drawBackgroundGrid_ = drawGrid;
+        update();
+    }
 
 signals:
     void nodeContextMenu(QGVNode* node);
@@ -90,6 +99,7 @@ private:
     QList<QGVEdge*> _edges;
     QList<QGVSubGraph*> _subGraphs;
     QGraphicsTextItem *_graphLabelItem = nullptr;
+    bool drawBackgroundGrid_ = false;
 };
 
 #endif // QGVSCENE_H

@@ -147,7 +147,12 @@ void QGVNode::updateLayout()
 
     if (_icon.isNull() && !label().isEmpty())
     {
+        auto topt = textItem_->document()->defaultTextOption();
+        topt.setAlignment(Qt::AlignCenter);
+        textItem_->document()->setDefaultTextOption(topt);
         textItem_->setHtml(label());
+        textItem_->adjustSize();
+
         textItem_->setPos(0, 0);
         auto itemRect = textItem_->boundingRect();
         auto nodeCenter = textItem_->mapFromParent(boundingRect().center());

@@ -22,6 +22,7 @@ License along with this library.
 #include <QGVEdgePrivate.h>
 #include <QDebug>
 #include <QPainter>
+#include <QTextDocument>
 
 QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *scene)
     : _scene(scene)
@@ -157,10 +158,6 @@ void QGVEdge::updateLayout()
 				_label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
     }
 #else
-    // FIXME: this crashes when using updateLayout() with the graph from the
-    // qgv_example tool. The label is non-null but the structure contains
-    // garbage data. Does not happen when calling updateLayout() with one of my
-    // test dotfiles loaded.
     textlabel_t *label = ED_xlabel(_edge->edge());
 
     if (!label)
@@ -168,7 +165,12 @@ void QGVEdge::updateLayout()
 
     if (label)
     {
+        auto topt = textItem_->document()->defaultTextOption();
+        topt.setAlignment(Qt::AlignCenter);
+        textItem_->document()->setDefaultTextOption(topt);
         textItem_->setHtml(label->text);
+        textItem_->adjustSize();
+
         textItem_->setPos(0, 0);
         auto itemRect = textItem_->boundingRect();
         auto labelCenter = QGVCore::toPoint(label->pos, gheight);

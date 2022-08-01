@@ -31,6 +31,11 @@ License along with this library.
 #include <QPainter>
 #include <QVarLengthArray>
 
+QGVScene::QGVScene(QObject *parent)
+    : QGVScene("qgv", parent)
+{
+}
+
 QGVScene::QGVScene(const QString &name, QObject *parent) : QGraphicsScene(parent)
 {
     _context = new QGVGvcPrivate(gvContext());
@@ -159,6 +164,13 @@ void QGVScene::setRootNode(QGVNode *node)
     Q_ASSERT(_nodes.contains(node));
     char root[] = "root";
     agset(_graph->graph(), root, node->label().toLocal8Bit().data());
+}
+
+void QGVScene::newGraph(const QString &name)
+{
+    clearGraphItems();
+    agclose(_graph->graph());
+    _graph->setGraph(agopen(name.toLocal8Bit().data(), Agdirected, NULL));
 }
 
 void QGVScene::loadLayout(const QString &text)

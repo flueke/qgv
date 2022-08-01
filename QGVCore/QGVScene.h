@@ -37,6 +37,7 @@ class QGVCORE_EXPORT QGVScene : public QGraphicsScene
     Q_OBJECT
 public:
 
+    explicit QGVScene(QObject *parent = 0);
     explicit QGVScene(const QString &name, QObject *parent = 0);
     ~QGVScene();
 
@@ -60,7 +61,8 @@ public:
     }
 
 public slots:
-    void loadLayout(const QString &text);
+    void newGraph(const QString &name = "qgv");
+    void loadLayout(const QString &text); // Load from DOT text
     void applyLayout();
     void clearGraphItems();
     void setDrawBackgroundGrid(bool drawGrid)

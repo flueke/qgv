@@ -26,6 +26,7 @@ class QGVNode;
 class QGVEdge;
 class QGVScene;
 class QGVGraphPrivate;
+class QGraphicsTextItem;
 
 /**
  * @brief SubGraph item
@@ -68,6 +69,8 @@ private:
     QRectF _label_rect;
 
     QList<QGVNode*> _nodes;
+
+    QGraphicsTextItem *textItem_ = nullptr;
 };
 
 #endif // QGVSUBGRAPH_H

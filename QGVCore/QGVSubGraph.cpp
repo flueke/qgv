@@ -23,10 +23,16 @@ License along with this library.
 #include <QGVNode.h>
 #include <QDebug>
 #include <QPainter>
+#include <QGraphicsTextItem>
+#include <QTextDocument>
 
-QGVSubGraph::QGVSubGraph(QGVGraphPrivate *subGraph, QGVScene *scene):  _scene(scene), _sgraph(subGraph)
+QGVSubGraph::QGVSubGraph(QGVGraphPrivate *subGraph, QGVScene *scene)
+    :  _scene(scene)
+    , _sgraph(subGraph)
+    , textItem_(new QGraphicsTextItem(this))
 {
-    //setFlag(QGraphicsItem::ItemIsSelectable, true);
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    textItem_->hide();
 }
 
 QGVSubGraph::~QGVSubGraph()
@@ -91,7 +97,8 @@ void QGVSubGraph::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QW
     painter->setBrush(_brush);
 
     painter->drawRect(boundingRect());
-    painter->drawText(_label_rect, Qt::AlignCenter, _label);
+    //painter->drawText(_label_rect, Qt::AlignCenter, _label);
+
     painter->restore();
 }
 
@@ -129,6 +136,7 @@ void QGVSubGraph::updateLayout()
     _pen.setColor(QGVCore::toColor(getAttribute("color")));
 
     //SubGraph label
+#if 0
     textlabel_t *xlabel = GD_label(_sgraph->graph());
     if(xlabel)
     {
@@ -136,4 +144,33 @@ void QGVSubGraph::updateLayout()
         _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
         _label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())) - pos());
     }
+#else
+    QString label;
+    if (auto xlabel = GD_label(_sgraph->graph()))
+        label = xlabel->text;
+
+    if (!label.isEmpty())
+    {
+        auto topt = textItem_->document()->defaultTextOption();
+        topt.setAlignment(Qt::AlignCenter);
+        textItem_->document()->setDefaultTextOption(topt);
+        textItem_->setHtml(label);
+        textItem_->adjustSize();
+
+        textItem_->setPos(0, 0);
+        auto itemRect = textItem_->boundingRect();
+        //auto nodeCenter = textItem_->mapFromParent(boundingRect().center());
+        auto nodeCenter = textItem_->mapFromParent(
+            boundingRect().center().x(),
+            boundingRect().top() + textItem_->boundingRect().height()*0.5);
+
+        itemRect.moveCenter(nodeCenter);
+        //qDebug() << this << "node pos=" << pos() << "textItem pos=" << textItem_->pos();
+        //qDebug() << this << "node rect=" << boundingRect() << ", textItem rect=" << textItem_->boundingRect();
+        textItem_->setPos(itemRect.topLeft());
+        textItem_->show();
+    }
+    else
+        textItem_->hide();
+#endif
 }

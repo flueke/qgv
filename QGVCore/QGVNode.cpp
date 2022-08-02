@@ -70,6 +70,15 @@ QRectF QGVNode::boundingRect() const
 
 void QGVNode::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    if (getAttribute("style").toLower() == "invis")
+    {
+        textItem_->hide();
+        return;
+    }
+
+    if (_icon.isNull() && !label().isEmpty())
+        textItem_->show();
+
     painter->save();
 
     painter->setPen(_pen);
@@ -149,6 +158,7 @@ void QGVNode::updateLayout()
     {
         auto topt = textItem_->document()->defaultTextOption();
         topt.setAlignment(Qt::AlignCenter);
+        topt.setWrapMode(QTextOption::NoWrap);
         textItem_->document()->setDefaultTextOption(topt);
         textItem_->setHtml(label());
         textItem_->adjustSize();

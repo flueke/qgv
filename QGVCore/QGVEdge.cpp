@@ -66,6 +66,9 @@ void QGVEdge::setLabel(const QString &label)
 
 void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
+    if (getAttribute("style").toLower() == "invis")
+        return;
+
     painter->save();
 
     if(isSelected())

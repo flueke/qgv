@@ -32,7 +32,7 @@ License along with this library.
 #include <QVarLengthArray>
 
 QGVScene::QGVScene(QObject *parent)
-    : QGVScene("qgv", parent)
+    : QGVScene("g", parent)
 {
 }
 
@@ -164,6 +164,16 @@ void QGVScene::setRootNode(QGVNode *node)
     Q_ASSERT(_nodes.contains(node));
     char root[] = "root";
     agset(_graph->graph(), root, node->label().toLocal8Bit().data());
+}
+
+//const Agraph_t *QGVScene::graph() const
+//{
+//    return _graph->graph();
+//}
+
+Agraph_t *QGVScene::graph()
+{
+    return _graph->graph();
 }
 
 void QGVScene::newGraph(const QString &name)

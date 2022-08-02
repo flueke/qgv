@@ -20,6 +20,7 @@ License along with this library.
 
 #include "qgv.h"
 #include <QGraphicsScene>
+#include <cgraph.h>
 
 class QGVNode;
 class QGVEdge;
@@ -59,6 +60,9 @@ public:
     {
         return drawBackgroundGrid_;
     }
+
+    //const Agraph_t *graph() const;
+    Agraph_t *graph();
 
 public slots:
     void newGraph(const QString &name = "qgv");

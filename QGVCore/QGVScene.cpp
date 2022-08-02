@@ -67,9 +67,15 @@ void QGVScene::setEdgeAttribute(const QString &name, const QString &value)
     agattr(_graph->graph(), AGEDGE, name.toLocal8Bit().data(), value.toLocal8Bit().data());
 }
 
-QGVNode *QGVScene::addNode(const QString &label)
+QGVNode *QGVScene::addNode(const QString &label, const QString &id)
 {
-    Agnode_t *node = agnode(_graph->graph(), NULL, TRUE);
+    Agnode_t *node{};
+
+    if (!id.isEmpty())
+        node = agnode(_graph->graph(), id.toLocal8Bit().data(), true);
+    else
+        node = agnode(_graph->graph(), NULL, TRUE);
+
     if(node == NULL)
     {
         qWarning()<<"Invalid node :"<<label;

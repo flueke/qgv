@@ -17,9 +17,9 @@ add_library(qgvcore SHARED
 target_link_libraries(qgvcore
         PRIVATE Qt5::Widgets
         PRIVATE Qt5::Gui
-        PRIVATE ${GRAPHVIZ_CDT_LIBRARY}
-        PRIVATE ${GRAPHVIZ_CGRAPH_LIBRARY}
-        PRIVATE ${GRAPHVIZ_GVC_LIBRARY})
+        PUBLIC ${GRAPHVIZ_CDT_LIBRARY}
+        PUBLIC ${GRAPHVIZ_CGRAPH_LIBRARY}
+        PUBLIC ${GRAPHVIZ_GVC_LIBRARY})
 
 target_include_directories(qgvcore
     PRIVATE ${GRAPHVIZ_INCLUDE_DIRS}

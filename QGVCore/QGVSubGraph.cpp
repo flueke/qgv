@@ -159,6 +159,7 @@ void QGVSubGraph::updateLayout()
     {
         auto topt = textItem_->document()->defaultTextOption();
         topt.setAlignment(Qt::AlignCenter);
+        topt.setWrapMode(QTextOption::NoWrap);
         textItem_->document()->setDefaultTextOption(topt);
         textItem_->setHtml(label);
         textItem_->adjustSize();

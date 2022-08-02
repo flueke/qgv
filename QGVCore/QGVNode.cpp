@@ -115,7 +115,20 @@ void QGVNode::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
 void QGVNode::setAttribute(const QString &name, const QString &value)
 {
     char empty[] = "";
-    agsafeset(_node->node(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), empty);
+
+    if (value.startsWith('<') && value.endsWith('>'))
+    {
+        auto v = value;
+        v.remove(0, 1);
+        v.chop(1);
+        char *html = agstrdup_html(_node->graph(), v.toLocal8Bit().data());
+        agsafeset(_node->node(), name.toLocal8Bit().data(), html, empty);
+        agstrfree(_node->graph(), html);
+    }
+    else
+    {
+        agsafeset(_node->node(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), empty);
+    }
 }
 
 QString QGVNode::getAttribute(const QString &name) const
@@ -154,13 +167,16 @@ void QGVNode::updateLayout()
 
     setToolTip(getAttribute("tooltip"));
 
-    if (_icon.isNull() && !label().isEmpty())
+    auto l = label();
+
+    if (_icon.isNull() && !l.isEmpty())
     {
         auto topt = textItem_->document()->defaultTextOption();
         topt.setAlignment(Qt::AlignCenter);
         topt.setWrapMode(QTextOption::NoWrap);
         textItem_->document()->setDefaultTextOption(topt);
-        textItem_->setHtml(label());
+        textItem_->setHtml(l);
+
         textItem_->adjustSize();
 
         textItem_->setPos(0, 0);

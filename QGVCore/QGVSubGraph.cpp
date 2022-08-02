@@ -46,9 +46,15 @@ QString QGVSubGraph::name() const
     return QString::fromLocal8Bit(GD_label(_sgraph->graph())->text);
 }
 
-QGVNode *QGVSubGraph::addNode(const QString &label)
+QGVNode *QGVSubGraph::addNode(const QString &label, const QString &id)
 {
-    Agnode_t *node = agnode(_sgraph->graph(), NULL, TRUE);
+    Agnode_t *node{};
+
+    if (!id.isEmpty())
+        node = agnode(_sgraph->graph(), id.toLocal8Bit().data(), true);
+    else
+        node = agnode(_sgraph->graph(), NULL, TRUE);
+
     if(node == NULL)
     {
         qWarning()<<"Invalid sub node :"<<label;

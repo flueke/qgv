@@ -39,7 +39,7 @@ public:
 
     QString name() const;
 
-    QGVNode* addNode(const QString& label);
+    QGVNode* addNode(const QString& label, const QString &id = {});
     QGVSubGraph* addSubGraph(const QString& name, bool cluster=true);
 
     QRectF boundingRect() const;

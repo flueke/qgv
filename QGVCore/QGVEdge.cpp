@@ -36,7 +36,7 @@ QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *scene)
 QGVEdge::~QGVEdge()
 {
     _scene->removeItem(this);
-		delete _edge;
+    delete _edge;
 }
 
 QString QGVEdge::label() const

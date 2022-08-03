@@ -262,15 +262,15 @@ void QGVScene::clearGraphItems()
 {
     gvFreeLayout(_context->context(), _graph->graph());
     for (auto node: _nodes)
-        removeItem(node);
+        delete node;
     _nodes.clear();
 
     for (auto edge: _edges)
-        removeItem(edge);
+        delete edge;
     _edges.clear();
 
     for (auto sg: _subGraphs)
-        removeItem(sg);
+        delete sg;
     _subGraphs.clear();
 
     if (_graphLabelItem)

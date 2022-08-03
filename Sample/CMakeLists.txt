@@ -13,7 +13,8 @@ target_link_libraries(qgv_example
     )
 
 target_include_directories(qgv_example
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
+    PRIVATE ${GRAPHVIZ_INCLUDE_DIRS}
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 
 # The COMPONENT option only defines the internal belonging of the INSTALL'ed thing

@@ -18,7 +18,7 @@ License along with this library.
 #ifndef QGVSUBGRAPH_H
 #define QGVSUBGRAPH_H
 
-#include "qgv.h"
+#include "qgv_export.h"
 #include <QGraphicsItem>
 #include <QPen>
 

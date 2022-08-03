@@ -1,5 +1,5 @@
-#ifndef QGV_H
-#define QGV_H
+#ifndef QGV_EXPORT_H
+#define QGV_EXPORT_H
 
 #include <QtGlobal>
 
@@ -9,4 +9,4 @@
 	#define QGVCORE_EXPORT Q_DECL_IMPORT
 #endif
 
-#endif // QGV_H
+#endif // QGV_EXPORT_H

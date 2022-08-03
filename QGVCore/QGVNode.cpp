@@ -118,6 +118,9 @@ void QGVNode::setAttribute(const QString &name, const QString &value)
 
     if (value.startsWith('<') && value.endsWith('>'))
     {
+        // Remove the HTML delimiters and create a graphviz html string. Then
+        // set it on the graph. This makes cgraph handle the html string as
+        // expected (lib/cgraph/refstr.c).
         auto v = value;
         v.remove(0, 1);
         v.chop(1);
@@ -141,6 +144,7 @@ QString QGVNode::getAttribute(const QString &name) const
 
 void QGVNode::setIcon(const QImage &icon)
 {
+    assert(!"QGVNode: icon rendering needs fixing");
     _icon = icon;
 }
 

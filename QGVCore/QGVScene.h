@@ -18,7 +18,7 @@ License along with this library.
 #ifndef QGVSCENE_H
 #define QGVSCENE_H
 
-#include "qgv.h"
+#include "qgv_export.h"
 #include <QGraphicsScene>
 #include <cgraph.h>
 

@@ -41,7 +41,7 @@ QGVEdge::~QGVEdge()
 
 QString QGVEdge::label() const
 {
-    return getAttribute("xlabel");
+    return getAttribute("label");
 }
 
 QRectF QGVEdge::boundingRect() const
@@ -61,7 +61,21 @@ QPainterPath QGVEdge::shape() const
 
 void QGVEdge::setLabel(const QString &label)
 {
-    setAttribute("xlabel", label);
+    setAttribute("label", label);
+}
+
+void QGVEdge::setAttribute(const QString &name, const QString &value)
+{
+    char empty[] = "";
+    agsafeset(_edge->edge(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), empty);
+}
+
+QString QGVEdge::getAttribute(const QString &name) const
+{
+		char* value = agget(_edge->edge(), name.toLocal8Bit().data());
+    if(value)
+        return value;
+    return QString();
 }
 
 void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidget *)
@@ -103,20 +117,6 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
     painter->drawPolygon(_tail_arrow);
 
     painter->restore();
-}
-
-void QGVEdge::setAttribute(const QString &name, const QString &value)
-{
-    char empty[] = "";
-    agsafeset(_edge->edge(), name.toLocal8Bit().data(), value.toLocal8Bit().data(), empty);
-}
-
-QString QGVEdge::getAttribute(const QString &name) const
-{
-		char* value = agget(_edge->edge(), name.toLocal8Bit().data());
-    if(value)
-        return value;
-    return QString();
 }
 
 void QGVEdge::updateLayout()
@@ -161,7 +161,7 @@ void QGVEdge::updateLayout()
 				_label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
     }
 #else
-    textlabel_t *label = ED_xlabel(_edge->edge());
+    textlabel_t *label = ED_label(_edge->edge());
 
     if (!label)
        label = ED_label(_edge->edge());

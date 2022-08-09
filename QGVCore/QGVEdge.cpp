@@ -27,10 +27,8 @@ License along with this library.
 QGVEdge::QGVEdge(QGVEdgePrivate *edge, QGVScene *scene)
     : _scene(scene)
     , _edge(edge)
-    , textItem_(new QGraphicsTextItem(this))
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-    textItem_->hide();
 }
 
 QGVEdge::~QGVEdge()
@@ -119,6 +117,32 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
     painter->restore();
 }
 
+namespace
+{
+void update_label_item(QGraphicsTextItem *item, textlabel_t *label, qreal gheight)
+{
+    assert(item);
+
+    if (label)
+    {
+        auto topt = item->document()->defaultTextOption();
+        topt.setAlignment(Qt::AlignCenter);
+        item->document()->setDefaultTextOption(topt);
+        item->setHtml(label->text);
+        item->adjustSize();
+
+        item->setPos(0, 0);
+        auto itemRect = item->boundingRect();
+        auto labelCenter = QGVCore::toPoint(label->pos, gheight);
+        itemRect.moveCenter(labelCenter);
+        item->setPos(itemRect.topLeft());
+        item->show();
+    }
+    else
+        item->hide();
+}
+}
+
 void QGVEdge::updateLayout()
 {
     prepareGeometryChange();
@@ -164,25 +188,41 @@ void QGVEdge::updateLayout()
     textlabel_t *label = ED_label(_edge->edge());
 
     if (!label)
-       label = ED_label(_edge->edge());
+       label = ED_xlabel(_edge->edge());
 
     if (label)
     {
-        auto topt = textItem_->document()->defaultTextOption();
-        topt.setAlignment(Qt::AlignCenter);
-        textItem_->document()->setDefaultTextOption(topt);
-        textItem_->setHtml(label->text);
-        textItem_->adjustSize();
+        if (!labelItem_)
+            labelItem_ = new QGraphicsTextItem(this);
 
-        textItem_->setPos(0, 0);
-        auto itemRect = textItem_->boundingRect();
-        auto labelCenter = QGVCore::toPoint(label->pos, gheight);
-        itemRect.moveCenter(labelCenter);
-        textItem_->setPos(itemRect.topLeft());
-        textItem_->show();
+        update_label_item(labelItem_, label, gheight);
     }
-    else
-        textItem_->hide();
+    else if (labelItem_)
+        labelItem_->hide();
+
+    label = ED_head_label(_edge->edge());
+
+    if (label)
+    {
+        if (!headLabelItem_)
+            headLabelItem_ = new QGraphicsTextItem(this);
+
+        update_label_item(headLabelItem_, label, gheight);
+    }
+    else if (headLabelItem_)
+        headLabelItem_->hide();
+
+    label = ED_tail_label(_edge->edge());
+
+    if (label)
+    {
+        if (!tailLabelItem_)
+            tailLabelItem_ = new QGraphicsTextItem(this);
+
+        update_label_item(tailLabelItem_, label, gheight);
+    }
+    else if (tailLabelItem_)
+        tailLabelItem_->hide();
 #endif
 
     setToolTip(getAttribute("tooltip"));

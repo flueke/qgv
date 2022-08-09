@@ -20,7 +20,7 @@ License along with this library.
 
 #include "qgv_export.h"
 #include <QGraphicsScene>
-#include <cgraph.h>
+#include <cgraph.h> // for Agraph_t*, was not able to forward declare it (FIXME)
 
 class QGVNode;
 class QGVEdge;
@@ -61,8 +61,9 @@ public:
         return drawBackgroundGrid_;
     }
 
-    //const Agraph_t *graph() const;
     Agraph_t *graph();
+
+    QString toDot() const;
 
 public slots:
     void newGraph(const QString &name = "qgv");

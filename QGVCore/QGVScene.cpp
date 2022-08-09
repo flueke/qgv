@@ -17,6 +17,7 @@ License along with this library.
 ***************************************************************/
 #include "QGVScene.h"
 
+#include <cstdio>
 #include <iostream>
 #include <QDebug>
 #include <QGraphicsSceneContextMenuEvent>
@@ -180,6 +181,21 @@ void QGVScene::setRootNode(QGVNode *node)
 Agraph_t *QGVScene::graph()
 {
     return _graph->graph();
+}
+
+QString QGVScene::toDot() const
+{
+    if (auto outfile = std::tmpfile())
+    {
+        agwrite(const_cast<QGVScene *>(this)->graph(), outfile);
+        auto bytesWritten = std::ftell(outfile);
+        std::rewind(outfile);
+        QByteArray data(bytesWritten, '\0');
+        std::fread(data.data(), bytesWritten, 1, outfile);
+        std::fclose(outfile);
+        return QString::fromLocal8Bit(data);
+    }
+    return {};
 }
 
 void QGVScene::newGraph(const QString &name)

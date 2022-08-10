@@ -78,7 +78,13 @@ QString QGVEdge::getAttribute(const QString &name) const
 
 void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidget *)
 {
-    if (getAttribute("style").toLower() == "invis")
+    const bool isInvis = getAttribute("style").toLower() == "invis";
+
+    if (labelItem_) labelItem_->setVisible(!isInvis);
+    if (headLabelItem_) headLabelItem_->setVisible(!isInvis);
+    if (tailLabelItem_) tailLabelItem_->setVisible(!isInvis);
+
+    if (isInvis)
         return;
 
     painter->save();
@@ -157,59 +163,31 @@ void QGVEdge::updateLayout()
     _pen.setColor(QGVCore::toColor(getAttribute("color")));
     _pen.setStyle(QGVCore::toPenStyle(getAttribute("style")));
 
-    //Edge label
-#if 0
-    textlabel_t *xlabel = ED_xlabel(_edge->edge());
-
-    if (!xlabel)
-        xlabel = ED_label(_edge->edge());
-
-    if(xlabel)
+    // Edge label handling
+    auto label_update_helper = [this, gheight] (QGraphicsTextItem **labelItemP, textlabel_t *label)
     {
-        _label = xlabel->text;
-        _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
-				_label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())));
-    }
-#else
+        assert(labelItemP);
+
+        if (label)
+        {
+            if (!*labelItemP)
+                *labelItemP = new QGraphicsTextItem(this);
+
+            update_label_item(*labelItemP, label, gheight);
+        }
+        else if (*labelItemP)
+            (*labelItemP)->hide();
+    };
+
     textlabel_t *label = ED_label(_edge->edge());
 
     if (!label)
        label = ED_xlabel(_edge->edge());
 
-    if (label)
-    {
-        if (!labelItem_)
-            labelItem_ = new QGraphicsTextItem(this);
+    label_update_helper(&labelItem_, label);
 
-        update_label_item(labelItem_, label, gheight);
-    }
-    else if (labelItem_)
-        labelItem_->hide();
-
-    label = ED_head_label(_edge->edge());
-
-    if (label)
-    {
-        if (!headLabelItem_)
-            headLabelItem_ = new QGraphicsTextItem(this);
-
-        update_label_item(headLabelItem_, label, gheight);
-    }
-    else if (headLabelItem_)
-        headLabelItem_->hide();
-
-    label = ED_tail_label(_edge->edge());
-
-    if (label)
-    {
-        if (!tailLabelItem_)
-            tailLabelItem_ = new QGraphicsTextItem(this);
-
-        update_label_item(tailLabelItem_, label, gheight);
-    }
-    else if (tailLabelItem_)
-        tailLabelItem_->hide();
-#endif
+    label_update_helper(&headLabelItem_, ED_head_label(_edge->edge()));
+    label_update_helper(&tailLabelItem_, ED_tail_label(_edge->edge()));
 
     setToolTip(getAttribute("tooltip"));
 }

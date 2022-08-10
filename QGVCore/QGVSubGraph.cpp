@@ -103,7 +103,6 @@ void QGVSubGraph::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QW
     painter->setBrush(_brush);
 
     painter->drawRect(boundingRect());
-    //painter->drawText(_label_rect, Qt::AlignCenter, _label);
 
     painter->restore();
 }
@@ -142,15 +141,6 @@ void QGVSubGraph::updateLayout()
     _pen.setColor(QGVCore::toColor(getAttribute("color")));
 
     //SubGraph label
-#if 0
-    textlabel_t *xlabel = GD_label(_sgraph->graph());
-    if(xlabel)
-    {
-        _label = xlabel->text;
-        _label_rect.setSize(QSize(xlabel->dimen.x, xlabel->dimen.y));
-        _label_rect.moveCenter(QGVCore::toPoint(xlabel->pos, QGVCore::graphHeight(_scene->_graph->graph())) - pos());
-    }
-#else
     QString label;
     if (auto xlabel = GD_label(_sgraph->graph()))
         label = xlabel->text;
@@ -166,7 +156,6 @@ void QGVSubGraph::updateLayout()
 
         textItem_->setPos(0, 0);
         auto itemRect = textItem_->boundingRect();
-        //auto nodeCenter = textItem_->mapFromParent(boundingRect().center());
         auto nodeCenter = textItem_->mapFromParent(
             boundingRect().center().x(),
             boundingRect().top() + textItem_->boundingRect().height()*0.5);
@@ -179,5 +168,4 @@ void QGVSubGraph::updateLayout()
     }
     else
         textItem_->hide();
-#endif
 }

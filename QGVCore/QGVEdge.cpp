@@ -96,20 +96,6 @@ void QGVEdge::paint(QPainter * painter, const QStyleOptionGraphicsItem *, QWidge
 
     painter->drawPath(_path);
 
-    /*
-    QRectF pp = _path.controlPointRect();
-    if(pp.width() < pp.height())
-    {
-        painter->save();
-        painter->translate(_label_rect.topLeft());
-        painter->rotate(90);
-        painter->drawText(QRectF(QPointF(0, -_label_rect.width()), _label_rect.size()), Qt::AlignCenter, _label);
-        painter->restore();
-    }
-    else
-    */
-    //painter->drawText(_label_rect, Qt::AlignCenter, _label);
-
     painter->setBrush(QBrush(_pen.color(), Qt::SolidPattern));
     painter->drawPolygon(_head_arrow);
     painter->drawPolygon(_tail_arrow);

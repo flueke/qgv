@@ -173,11 +173,6 @@ void QGVScene::setRootNode(QGVNode *node)
     agset(_graph->graph(), root, node->label().toLocal8Bit().data());
 }
 
-//const Agraph_t *QGVScene::graph() const
-//{
-//    return _graph->graph();
-//}
-
 Agraph_t *QGVScene::graph()
 {
     return _graph->graph();

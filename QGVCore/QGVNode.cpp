@@ -27,6 +27,7 @@ License along with this library.
 #include <QFontMetricsF>
 #include <QPicture>
 #include <QGraphicsTextItem>
+#include "private/qgv_compat.h"
 
 QGVNode::QGVNode(QGVNodePrivate *node, QGVScene *scene)
     : _scene(scene)
